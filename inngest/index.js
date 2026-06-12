@@ -15,20 +15,19 @@ export const inngest = new Inngest({
    AUTO CHECKOUT FUNCTION
 ========================= */
 const autoCheckOut = inngest.createFunction(
-  { id: "auto-check-out" },
-  { event: "employee/check-out" },
-
+  {
+    id: "auto-check-out",
+    triggers: [{ event: "employee/check-out" }],
+  },
   async ({ event, step }) => {
     const { employeeId, attendanceId } = event.data;
 
     await step.sleep("wait-9-hours", "9h");
 
     let attendance = await Attendance.findById(attendanceId);
-
     if (!attendance || attendance.checkOut) return;
 
     const employee = await Employee.findById(employeeId);
-
     if (!employee) return;
 
     await sendEmail({
@@ -52,14 +51,13 @@ const autoCheckOut = inngest.createFunction(
     await step.sleep("wait-1-hour", "1h");
 
     attendance = await Attendance.findById(attendanceId);
-
     if (!attendance || attendance.checkOut) return;
 
     attendance.checkOut =
       new Date(attendance.checkIn).getTime() + 4 * 60 * 60 * 1000;
 
     attendance.workingHours = 4;
-    attendance.dayType = "Half Day"; // FIXED typo (fayType -> dayType)
+    attendance.dayType = "Half Day";
     attendance.status = "LATE";
 
     await attendance.save();
@@ -70,9 +68,10 @@ const autoCheckOut = inngest.createFunction(
    LEAVE REMINDER FUNCTION
 ========================= */
 const leaveApplicationReminder = inngest.createFunction(
-  { id: "leave-application-reminder" },
-  { event: "leave/pending" },
-
+  {
+    id: "leave-application-reminder",
+    triggers: [{ event: "leave/pending" }],
+  },
   async ({ event, step }) => {
     const { leaveApplicationId } = event.data;
 
@@ -84,7 +83,6 @@ const leaveApplicationReminder = inngest.createFunction(
     if (!leaveApplication || leaveApplication.status !== "PENDING") return;
 
     const employee = await Employee.findById(leaveApplication.employeeId);
-
     if (!employee) return;
 
     await sendEmail({
@@ -111,9 +109,10 @@ const leaveApplicationReminder = inngest.createFunction(
    DAILY ATTENDANCE CRON
 ========================= */
 const attendanceReminderCron = inngest.createFunction(
-  { id: "attendance-reminder-cron" },
-  { cron: "TZ=Asia/Lahore 30 11 * * *" },
-
+  {
+    id: "attendance-reminder-cron",
+    triggers: [{ cron: "30 11 * * *" }],
+  },
   async ({ step }) => {
     const today = await step.run("today-range", () => {
       const start = new Date();
@@ -195,7 +194,7 @@ const attendanceReminderCron = inngest.createFunction(
 );
 
 /* =========================
-   EXPORT FUNCTIONS
+   EXPORT
 ========================= */
 export const functions = [
   autoCheckOut,
