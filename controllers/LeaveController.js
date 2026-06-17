@@ -6,10 +6,10 @@ import LeaveApplication from "../models/LeaveApplication.js";
 // POST /api/leaves
 export const createLeave = async (req, res) => {
   try {
-    const session = req.session; // or req.user if using JWT
+    const user = req.user; // or req.user if using JWT
 
     const employee = await Employee.findOne({
-      userId: session.userId,
+      userId: user.userId,
     });
 
     if (!employee) {
@@ -78,9 +78,9 @@ export const createLeave = async (req, res) => {
 // GET /api/leaves
 export const getLeaves = async (req, res) => {
   try {
-    const session = req.session; // or req.user
+    const user = req.user; // or req.user
 
-    const isAdmin = session.role === "ADMIN";
+    const isAdmin = user.role === "ADMIN";
 
     // ADMIN VIEW
     if (isAdmin) {
@@ -107,7 +107,7 @@ export const getLeaves = async (req, res) => {
 
     // EMPLOYEE VIEW
     const employee = await Employee.findOne({
-      userId: session.userId,
+      userId: user.userId,
     }).lean();
 
     if (!employee) {

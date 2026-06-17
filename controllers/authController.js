@@ -7,6 +7,9 @@ export const login = async (req, res) => {
   try {
     const { email, password, roleType } = req.body;
 
+    console.log("Email:", email);
+    console.log("Role:", roleType);
+
     if (!email || !password) {
       return res.status(400).json({
         error: "Email and password are required",
@@ -14,6 +17,8 @@ export const login = async (req, res) => {
     }
 
     const user = await User.findOne({ email });
+
+    console.log("User found:", user);
 
     if (!user) {
       return res.status(401).json({
@@ -34,6 +39,8 @@ export const login = async (req, res) => {
     }
 
     const isValid = await bcrypt.compare(password, user.password);
+
+    console.log("Password Match:", isValid);
 
     if (!isValid) {
       return res.status(401).json({

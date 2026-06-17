@@ -4,15 +4,15 @@ import Employee from "../models/Employee.js";
 // GET /api/profile
 export const getProfile = async (req, res) => {
   try {
-    const session = req.session;
-    const employee = await Employee.findOne({ userId: session.userId });
+    const user = req.user;
+
+    const employee = await Employee.findOne({ userId: user.userId });
 
     if (!employee) {
-      // AUTHENTICATION USER IS NOT AN EMPLOYEE - RETURN ADMIN PROFILE
       return res.json({
         firstName: "Admin",
         lastName: "",
-        email: session.email,
+        email: user.email,
       });
     }
 
@@ -26,8 +26,8 @@ export const getProfile = async (req, res) => {
 // UPDATE /api/profile
 export const updateProfile = async (req, res) => {
   try {
-    const session = req.session;
-    const employee = await Employee.findOne({ userId: session.userId });
+    const user = req.user;
+    const employee = await Employee.findOne({ userId: user.userId });
     if (!employee) {
       return res.status(404).json({
         error: "Employee Not Found",

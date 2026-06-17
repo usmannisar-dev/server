@@ -8,10 +8,10 @@ import { DEPARTMENTS } from "../constants/departments.js";
 // GET /api/dashboard
 export const getDashboard = async (req, res) => {
   try {
-    const session = req.session;
+    const user = req.user;
 
     // ADMIN DASHBOARD
-    if (session.role === "ADMIN") {
+    if (user.role === "ADMIN") {
       const [totalEmployees, todayAttendance, pendingLeaves] =
         await Promise.all([
           Employee.countDocuments({
@@ -41,7 +41,7 @@ export const getDashboard = async (req, res) => {
 
     // EMPLOYEE DASHBOARD
     const employee = await Employee.findOne({
-      userId: session.userId,
+      userId: user.userId,
     }).lean();
 
     if (!employee) {

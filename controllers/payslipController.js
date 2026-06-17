@@ -47,9 +47,9 @@ export const createPayslip = async (req, res) => {
 // GET /api/payslips
 export const getPayslips = async (req, res) => {
   try {
-    const session = req.session; // OR req.user
+    const user = req.user; // OR req.user
 
-    const isAdmin = session.role === "ADMIN";
+    const isAdmin = user.role === "ADMIN";
 
     // ADMIN
     if (isAdmin) {
@@ -75,7 +75,7 @@ export const getPayslips = async (req, res) => {
 
     // EMPLOYEE
     const employee = await Employee.findOne({
-      userId: session.userId,
+      userId: user.userId,
     });
 
     if (!employee) {
